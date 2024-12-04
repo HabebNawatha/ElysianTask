@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { loginUser } from "../services/api";
 import './RegistrationPage.css';
 import img from '../images/image.png'
 
@@ -6,11 +7,25 @@ const RegistrationPage = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [errorMsg, setErrorMsg] = useState("");
-
+    const [toastMessage,setToastMessage] = useState("Login Successful");
+    const [showToastMessage,setShowToastMessage] = useState(false);
 
     const handleLogin = async (e) => {
         e.preventDefault();
         console.log("Login button clicked");
+
+        const loginData = { email, password };
+        try {
+            const response = await loginUser(loginData);
+            console.log("Login successful", response);
+            setShowToastMessage(true);
+        } catch (error) {
+            console.error("login failed", error.response ? error.response.data : error);
+            setErrorMsg("Login failed! Please check your credentails.");
+            setTimeout(() => {
+                setErrorMsg("");
+            }, 3000);
+        }
     }
 
     const handleForgotPassword = () => {
@@ -27,6 +42,10 @@ const RegistrationPage = () => {
 
     const handleRegister = () => {
         console.log("Register button clicked");
+    }
+
+    const handleCloseToast = () => {
+        setShowToastMessage(false);
     }
 
     return (
@@ -69,6 +88,12 @@ const RegistrationPage = () => {
                     </form>
                 </div>
             </div>
+            {showToastMessage && (
+                 <div className="toast-message">
+                 <span>{toastMessage}</span>
+                 <button className="close-toast" onClick={handleCloseToast}>X</button>
+             </div>
+            )}
         </div>
     )
 }

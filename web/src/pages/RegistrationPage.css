@@ -98,6 +98,7 @@ body {
     color: white;
     margin-top: 20px;
     font-size: 15px;
+    cursor: pointer;
 }
 
 .form-social-buttons{
@@ -117,6 +118,7 @@ body {
     color: #3949AB;
     font-size: 15px;
     margin-bottom: 30px;
+    cursor: pointer;
 }
 
 .divider-text {
@@ -134,14 +136,15 @@ body {
 }
 
 .register-button{
-        border-radius: 40px;
-        border: 1px solid #3949AB;
-        width: 100%;
-        height: 35px;
-        background-color: #FFFFFF;
-        color: #3949AB;
-        font-size: 15px;
-        margin-top: 10px;
+    border-radius: 40px;
+    border: 1px solid #3949AB;
+    width: 100%;
+    height: 35px;
+    background-color: #FFFFFF;
+    color: #3949AB;
+    font-size: 15px;
+    margin-top: 10px;
+    cursor: pointer;
 }
 
 .error-message {
@@ -160,4 +163,31 @@ body {
     opacity: 1;
     visibility: visible;
 
+}
+
+.toast-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #5769D4;
+    color: white;
+    padding: 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    width: 20%;
+    height: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.close-toast {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 0 10px;
 }
