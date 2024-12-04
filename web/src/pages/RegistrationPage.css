@@ -1,0 +1,163 @@
+body {
+    background-color: #5769D4;
+    margin: 0;
+    padding: 0;
+}
+.container{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.split-container{
+    display: flex;
+    width: 1200px;
+    height: 700px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    overflow: hidden;   
+}
+
+.welcome-wrapper{
+    flex: 2;
+    background-color: #3949AB;
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+
+.welcome-wrapper p{
+    font-size: 15px;
+}
+
+.image-wrapper img{
+    width: 300px;
+}
+
+.form-wrapper{
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    background-color: #FFFFFF;
+    flex-direction: column;
+    margin-top: 80px;
+    text-align: center;
+}
+
+.form-wrapper h4{
+    margin-bottom: 40px;
+    color: #3949AB;
+    text-align: center;
+}
+
+.form-group{
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.form-group input{
+    width: 100%;
+    height: 35px;
+    border: 1px solid;
+    border-color: #D0D0D0;
+    border-radius: 8px;
+    font-size: 15px;
+    margin-bottom: 8px;
+    padding-left: 1.5rem;
+}
+.icon{
+    height: 1.5rem;
+    width: 1.5rem;
+    background-color: red;
+    padding: 4px;
+    position: absolute;
+    box-sizing:border-box;
+    top:34%;
+    left:61%;
+    transform: translateY(-50%);
+}
+
+.form-buttons{
+    width: 100%;
+    flex-direction: column;
+}
+
+.submit-button{
+    border: none ;
+    border-radius: 40px;
+    width: 100%;
+    height: 35px;
+    background-color: #3949AB;
+    color: white;
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+.form-social-buttons{
+    flex-direction: row;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.form-social-buttons button{
+    border-radius: 40px;
+    text-align: center;
+    border: 1px solid #3949AB;
+    background-color: #FFFFFF;
+    width: 47%;
+    height: 35px;
+    color: #3949AB;
+    font-size: 15px;
+    margin-bottom: 30px;
+}
+
+.divider-text {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    font-size: 15px;
+    color: #7b7b7b;
+}
+
+.divider-span {
+    font-size: 15px;
+    color: #3949AB;
+    text-align: end;
+    cursor: pointer;
+}
+
+.register-button{
+        border-radius: 40px;
+        border: 1px solid #3949AB;
+        width: 100%;
+        height: 35px;
+        background-color: #FFFFFF;
+        color: #3949AB;
+        font-size: 15px;
+        margin-top: 10px;
+}
+
+.error-message {
+    color: red;
+    opacity: 1;
+    visibility: visible;
+
+}
+
+.error-message.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.error-message.fade-in {
+    opacity: 1;
+    visibility: visible;
+
+}
