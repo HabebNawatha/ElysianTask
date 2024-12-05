@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { loginUser } from "../services/api";
+import { facebookLogin, googleLogin, loginUser } from "../services/api";
 import './RegistrationPage.css';
 import img from '../images/image.png'
+import { useGoogleLogin } from "@react-oauth/google";
+import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
 
 const RegistrationPage = () => {
     const [email, setEmail] = useState("");
@@ -9,6 +11,7 @@ const RegistrationPage = () => {
     const [errorMsg, setErrorMsg] = useState("");
     const [toastMessage,setToastMessage] = useState("Login Successful");
     const [showToastMessage,setShowToastMessage] = useState(false);
+    const facebookAPPId = process.env.REACT_APP_FACEBOOK_APP_ID;
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -32,12 +35,49 @@ const RegistrationPage = () => {
         console.log("Forgot password clicked");
     }
 
-    const handleGoogleLogin = () => {
-        console.log("Google login clicked");
-    }
+    const handleGoogleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            console.log("Google login successfuly", tokenResponse);
+    
+            try {
+                const {access_token} = tokenResponse;
+                if (access_token){
+                    const data = await googleLogin(access_token);
+                    console.log("Google Auth Response:", data);
+                    setToastMessage("Google login successful!");
+                    setShowToastMessage(true);
+                }else {
+                    setErrorMsg("Access token not found.");
+                }
+            } catch (error) {
+                setErrorMsg("Google login failed! Please try again.");
+                setTimeout(() => {
+                    setErrorMsg("");
+                }, 3000);
+            }
+        },
+        onError: () => {
+            setErrorMsg("Google login failed! Please try again.");
+            console.error("Google login error occurred.");
+        },
+    });
 
-    const handleFacebookLogin = () => {
-        console.log("Facebook  login clicked");
+    const handleFacebookLogin = async (response) => {
+        if (response?.status == "unknown") {
+            setErrorMsg("Something went wrong with facebook Login.");
+            return;
+        }
+        try {
+            const data = await facebookLogin(response.accessToken);
+            console.log("Facebook Auth Response:", data);
+            setToastMessage("Facebook login successful!");
+            setShowToastMessage(true);
+        } catch (error) {
+            setErrorMsg("Facebook login failed! Please try again.");
+            setTimeout(() => {
+                setErrorMsg("");
+            }, 3000);
+        }
     }
 
     const handleRegister = () => {
@@ -80,7 +120,11 @@ const RegistrationPage = () => {
                             <div className="divider-text">Or</div>
                             <div className='form-social-buttons'>
                                 <button type="button" onClick={handleGoogleLogin}> Google</button>
-                                <button type="button" onClick={handleFacebookLogin}> Facebook</button>
+                                <FacebookLogin appId={facebookAPPId} autoLoad={false} fields="name,email,picture" callback={handleFacebookLogin}
+                                render={renderProps => (
+                                    <button onClick={renderProps.onClick}> Facebook </button>
+                                )}
+                                />
                             </div>
                             <div className="divider-text">Have no account yet?</div>
                             <button className="register-button" type="button" onClick={handleRegister}>Register</button>

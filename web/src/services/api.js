@@ -13,3 +13,25 @@ export const loginUser = async (loginData) => {
         throw error;
     }
 };
+
+export const googleLogin = async (accessToken) => {
+    try {
+        const response = await api.post("/auth/google", {
+            token: accessToken,
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error during Google login:", error);
+        throw error;
+    }
+};
+
+export const facebookLogin = async (accessToken) => {
+    try {
+        const response = await api.post("/auth/facebook" , { token: accessToken});
+        return response.data;
+    } catch ( error ) {
+        console.error("Error during Facebook login:", error);
+        throw error;
+    }
+};
