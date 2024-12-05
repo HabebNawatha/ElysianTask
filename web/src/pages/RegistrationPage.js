@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { facebookLogin, googleLogin, loginUser } from "../services/api";
+import { facebookLogin, googleLogin, loginUser, registerUser } from "../services/api";
 import './RegistrationPage.css';
 import img from '../images/image.png'
 import { useGoogleLogin } from "@react-oauth/google";
@@ -21,6 +21,7 @@ const RegistrationPage = () => {
         try {
             const response = await loginUser(loginData);
             console.log("Login successful", response);
+            setToastMessage("Login successful!");
             setShowToastMessage(true);
         } catch (error) {
             console.error("login failed", error.response ? error.response.data : error);
@@ -80,8 +81,22 @@ const RegistrationPage = () => {
         }
     }
 
-    const handleRegister = () => {
+    const handleRegister = async (e) => {
+        e.preventDefault();
         console.log("Register button clicked");
+        const registerData = { email, password };
+        try {
+            const response = await registerUser(registerData);
+            console.log("Register successful", response);
+            setToastMessage("Account Created Successfuly, Now you can Log in!");
+            setShowToastMessage(true);
+        } catch (error) {
+            console.error("Register failed", error.response ? error.response.data : error);
+            setErrorMsg(error.response.data.message);
+            setTimeout(() => {
+                setErrorMsg("");
+            }, 3000);
+        }
     }
 
     const handleCloseToast = () => {
