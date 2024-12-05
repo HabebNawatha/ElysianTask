@@ -3,12 +3,16 @@ from flask_cors import CORS
 from flask_cors import cross_origin
 from pymongo.mongo_client import MongoClient
 from dotenv import load_dotenv
+import google.auth.transport.requests
+import google.oauth2.id_token
 import certifi
 import os
+import requests
 
 load_dotenv()
 
 MONGO_URI = os.getenv("MONGO_URI")
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 DB_NAME = os.getenv("DB_NAME")
 USERS_COLLECTION = os.getenv("USERS_COLLECTION")
 
@@ -43,6 +47,59 @@ def test_db():
         return jsonify({"message":"Connected to MongoDB!","database":db_list})
     except Exception as e:
         return jsonify({"error":str(e)}),500
+    
+@app.route('/auth/facebook' , methods=['POST'])
+def facebook_auth():
+    try:
+        access_token = request.json.get('token')
+        if not access_token:
+            return jsonify({"error": "Access token is required"}), 400
+        
+        graph_url = f"https://graph.facebook.com/me?fields=id,name,email,picture&access_token={access_token}"
+        response = requests.get(graph_url)
+
+        if response.status_code != 200:
+            return jsonify({"error": "Invalid Facebook token"}), 400
+        
+        user_data = response.json()
+
+        facebook_id = user_data.get("id")
+        name = user_data.get("name")
+        email = user_data.get("email")
+        picture = user_data.get("picture", {}).get("data", {}).get("url")
+
+        return jsonify({
+            "facebook_id": facebook_id,
+            "name": name,
+            "email": email,
+            "picture": picture,
+        }), 200
+    except Exception as e:
+        print(f"Error during Facebook login: {e}")
+        return jsonify({"error": "An error occurred during Facebook login"}), 500
+
+@app.route('/auth/google' , methods=['POST'])
+def google_auth():
+    token = request.json.get('token')
+    if not token:
+        return jsonify({"message": "Token is missing!"}), 400
+
+    try:
+        google_response = requests.get(f'https://www.googleapis.com/oauth2/v1/userinfo?access_token={token}')
+        if google_response.status_code != 200:
+            return jsonify({"message": "Invalid token"}), 400
+
+        user_info = google_response.json()
+        google_email = user_info.get("email")
+        google_name = user_info.get("name")
+
+        if not google_email or not google_name:
+            return jsonify({"message": "Failed to retrieve user info"}), 400
+
+        return jsonify({"message": "User authenticated", "user": user_info}), 200
+
+    except requests.exceptions.RequestException as e:
+        return jsonify({"message": str(e)}), 500
 
 @app.route('/login', methods=['POST'])
 def login():
