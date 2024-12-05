@@ -14,6 +14,15 @@ export const loginUser = async (loginData) => {
     }
 };
 
+export const registerUser = async (registerData) => {
+    try {
+        const response = await api.post("/register" , registerData);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export const googleLogin = async (accessToken) => {
     try {
         const response = await api.post("/auth/google", {

@@ -7,7 +7,9 @@ import google.auth.transport.requests
 import google.oauth2.id_token
 import certifi
 import os
+from datetime import datetime
 import requests
+from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
 
@@ -114,13 +116,40 @@ def login():
     user = users_collection.find_one({"email":email})
 
     if user:
-        if user['password'] == password:
+        if check_password_hash(user['password'], password):
             return jsonify({'message':'User logged in successfuly'}),200
         else:
             return jsonify({'message':'User not found'}), 401
     else:
         return jsonify({'message':'User not found'}), 404
 
+@app.route('/register' , methods=['POST'])
+def register():
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
+
+    if not email or not password:
+        return jsonify({'message': ' Email and password are required!'}),400
+    
+    users_collection = db[USERS_COLLECTION]
+    exisiting_user = users_collection.find_one({'email': email})
+
+    if exisiting_user:
+        return jsonify({'message':'User already exists with this email!'}),400
+    
+    hashed_password = generate_password_hash(password)
+
+    new_user = {
+        'email': email,
+        'password': hashed_password,
+        'created_at': datetime.now()
+    }
+
+    users_collection.insert_one(new_user)
+
+    return jsonify({'message':'User registered successfuly!'}),201
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
