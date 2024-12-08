@@ -1,21 +1,47 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { loginUser } from '@/services/api';
+import { facebookLogin, googleLogin, loginUser,registerUser } from '@/services/api';
+import * as Google from 'expo-auth-session/providers/google';
+import * as WebBrowser from 'expo-web-browser';
+import * as Facebook from 'expo-facebook';
+
+
+
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
+
+  const[request,response,promptAsync] = Google.useAuthRequest({
+    clientId:process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    iosClientId:process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    androidClientId:process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+  });
+  
+  useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+      console.log('Google Login Success:', authentication);
+    }
+  }, [response]);
+
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
 
   const handleLogin = async () => {
     console.log("Login button clicked");
+
+    const loginData = {email,password};
     try{
-      const loginData = {email,password};
       const response = await loginUser(loginData);
       console.log('Login Success:',response);
+      Alert.alert('Success','Login successful!');
     } catch (error : any) {
       console.error('Login failed:', error);
-      Alert.alert('Login Failed', error.message || 'An error occured');
+      Alert.alert('Error','Login failed! Please check your credentails');
     }
   }
 
@@ -23,16 +49,57 @@ export default function LoginScreen() {
     console.log("Forgot password button clicked");
   }
 
-  const handleGoogleLogin = () => {
-    console.log("Google login clicked");
+  const handleGoogleLogin = async () => {
+    if(request){
+      await promptAsync();
+    } else {
+      Alert.alert('Google Login not ready');
+    }
   }
 
-  const handleFacebookLogin = () => {
-    console.log("Facebook login clicked");
+  const handleFacebookLogin = async () => {
+    try {
+      if (Facebook && Facebook.initializeAsync) {
+        await Facebook.initializeAsync({
+          appId: process.env.EXPO_PUBLIC_FACEBOOK_APP_ID,
+        });
+      } else {
+        console.error("Facebook SDK is not properly loaded.");
+      }
+      const result = await Facebook.logInWithReadPermissionsAsync({
+        permissions: ['public_profile', 'email'],
+      });
+
+      console.log("Facebook Login Result:", result);
+
+      if (result.type == 'success') {
+        const userId = await Facebook.getUserIDAsync();
+        console.log("Facebook login successful", userId);
+
+        const response = await facebookLogin(result.token);
+        const userData = await response.json;
+        setUserInfo(userData);
+        console.log("user data:", userData);
+      } else {
+        Alert.alert('Facebook login failed', 'Please try again.');
+      }
+    } catch (error : any) {
+      console.error('Facebook login error:', error);
+      Alert.alert('An error occurred during login', error.message || 'Unknown error');
+    }
   }
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     console.log("Register button clicked");
+    const registerData = { email, password };
+    try{
+      const response = await registerUser(registerData);
+      console.log("Register successful", response);
+      Alert.alert('Success','Account created successfuly! Now you can log in.');
+    } catch (error : any){
+      console.error('Login failed:', error);
+      Alert.alert('Error', error.message || 'An error occured');
+    }
   }
 
   return (
