@@ -9,7 +9,6 @@ interface LoginData {
 interface RegisterData {
   email: string;
   password: string;
-  username: string;
 }
 
 interface GoogleLoginData {
