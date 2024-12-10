@@ -166,10 +166,14 @@ def forgot_password():
         if not recipient_email:
             return jsonify({'message': 'Email is required!'}), 400
         
+        frontend_host = request.headers.get('Origin', 'http://localhost:3000')
+        reset_link = f"{frontend_host}/forgot-password"
+        print(reset_link)
+        
         msg = Message(
-            subject="Password Rset Request",
+            subject="Password Reset Request",
             recipients=[recipient_email],
-            body="Click the link to reset your password: http://localhost:3000/forgot-password"
+            body=f"Click the link to reset your password: {reset_link}"
         )
 
         mail.send(msg)
