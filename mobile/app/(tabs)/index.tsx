@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { facebookLogin, forgotPassowrd, googleLogin, loginUser,registerUser } from '@/services/api';
+import { chatMessage, facebookLogin, forgotPassowrd, googleLogin, loginUser,registerUser } from '@/services/api';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import * as Facebook from 'expo-facebook';
@@ -28,7 +28,6 @@ export default function LoginScreen() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
 
   const handleLogin = async () => {
@@ -38,7 +37,9 @@ export default function LoginScreen() {
     try{
       const response = await loginUser(loginData);
       console.log('Login Success:',response);
-      Alert.alert('Success','Login successful!');
+      const chatResponse = await chatMessage('Hello chat!');
+      const successMessage = chatResponse?.reply || 'Login Successful';
+      Alert.alert('Success',successMessage);
     } catch (error : any) {
       console.error('Login failed:', error);
       Alert.alert('Error','Login failed! Please check your credentails');
@@ -109,6 +110,7 @@ export default function LoginScreen() {
       Alert.alert('Error', error.message || 'An error occured');
     }
   }
+
 
   return (
     <ThemedView style={styles.container}>

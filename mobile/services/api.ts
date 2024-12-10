@@ -93,3 +93,12 @@ export const changePassword = async (userData:ChangePasswordData): Promise<any> 
         throw error;
     }
 }
+
+export const chatMessage = async (message: string): Promise<any> => {
+  try {
+      const response: AxiosResponse = await axios.post('http://localhost:4000/message', {message});
+      console.log('ChatGPT reply:',response.data.reply);
+  } catch (error) {
+      console.error('Error sending message:',error);
+  }
+}
