@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { facebookLogin, googleLogin, loginUser, registerUser } from "../services/api";
+import { facebookLogin, forgotPassword, googleLogin, loginUser, registerUser } from "../services/api";
 import './RegistrationPage.css';
 import img from '../images/image.png'
 import { useGoogleLogin } from "@react-oauth/google";
@@ -32,8 +32,20 @@ const RegistrationPage = () => {
         }
     }
 
-    const handleForgotPassword = () => {
+    const handleForgotPassword = async () => {
         console.log("Forgot password clicked");
+        try {
+            const response = await forgotPassword(email);
+            console.log("Forgot password successful", response);
+            setToastMessage("Email sent successfuly!");
+            setShowToastMessage(true);
+        } catch (error) {
+            console.error("Forgot password failed", error.response ? error.response.data : error);
+            setErrorMsg(error.response?.data?.message || "An unknown error occurred.");
+            setTimeout(() => {
+                setErrorMsg("");
+            }, 3000);
+        }
     }
 
     const handleGoogleLogin = useGoogleLogin({
@@ -92,7 +104,7 @@ const RegistrationPage = () => {
             setShowToastMessage(true);
         } catch (error) {
             console.error("Register failed", error.response ? error.response.data : error);
-            setErrorMsg(error.response.data.message);
+            setErrorMsg(error.response?.data?.message || "An unknown error occurred.");
             setTimeout(() => {
                 setErrorMsg("");
             }, 3000);
