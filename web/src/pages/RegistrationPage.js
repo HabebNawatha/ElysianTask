@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { facebookLogin, forgotPassword, googleLogin, loginUser, registerUser } from "../services/api";
+import { chatMessage, facebookLogin, forgotPassword, googleLogin, loginUser, registerUser } from "../services/api";
 import './RegistrationPage.css';
 import img from '../images/image.png'
 import { useGoogleLogin } from "@react-oauth/google";
@@ -21,11 +21,26 @@ const RegistrationPage = () => {
         try {
             const response = await loginUser(loginData);
             console.log("Login successful", response);
-            setToastMessage("Login successful!");
-            setShowToastMessage(true);
+            await handleGPTMessage();
         } catch (error) {
             console.error("login failed", error.response ? error.response.data : error);
             setErrorMsg("Login failed! Please check your credentails.");
+            setTimeout(() => {
+                setErrorMsg("");
+            }, 3000);
+        }
+    }
+
+    const handleGPTMessage = async () => {
+        try{
+        const gptResponse = await chatMessage("Hello");
+        console.log("ChatGPT reply:", gptResponse);
+
+        setToastMessage(gptResponse || 'Chat GPT Failed!');
+        setShowToastMessage(true);
+        } catch (error){
+            console.error("Chat gpt failed", error.response ? error.response.data : error);
+            setErrorMsg("Chat GPT failed!");
             setTimeout(() => {
                 setErrorMsg("");
             }, 3000);

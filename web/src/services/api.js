@@ -64,3 +64,12 @@ export const changePassword = async (userData) => {
         throw error;
     }
 }
+
+export const chatMessage = async (message) => {
+    try {
+        const response = await axios.post('http://localhost:4000/message', {message});
+        console.log('ChatGPT reply:',response.data.reply);
+    } catch (error) {
+        console.error('Error sending message:',error);
+    }
+}
