@@ -19,6 +19,11 @@ interface FacebookLoginData {
   token: string;
 }
 
+interface ChangePasswordData {
+    email: string;
+    password: string;
+}
+
 const api = axios.create({
   baseURL: 'http://localhost:5000/',
   timeout: 5000,
@@ -68,3 +73,23 @@ export const facebookLogin = async (accessToken: string): Promise<any> => {
     throw error;
   }
 };
+
+export const forgotPassowrd = async (email: string): Promise<any> => {
+    try{
+        const response: AxiosResponse = await api.post("forgot-password", {email});
+        return response.data;
+    } catch (error) {
+        console.error("Error during forgot passsword handling:", error);
+        throw error;
+    }
+}
+
+export const changePassword = async (userData:ChangePasswordData): Promise<any> => {
+    try {
+        const response: AxiosResponse = await api.post("/change-password" , userData);
+        return response.data;
+    } catch (error) {
+        console.error("Error during change password:", error);
+        throw error;
+    }
+}
