@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, TextInput, Text, TouchableOpacity, Image, Alert } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
-import { facebookLogin, googleLogin, loginUser,registerUser } from '@/services/api';
+import { facebookLogin, forgotPassowrd, googleLogin, loginUser,registerUser } from '@/services/api';
 import * as Google from 'expo-auth-session/providers/google';
 import * as WebBrowser from 'expo-web-browser';
 import * as Facebook from 'expo-facebook';
@@ -45,8 +45,16 @@ export default function LoginScreen() {
     }
   }
 
-  const handleForgotPassword = () => {
+  const handleForgotPassword = async () => {
     console.log("Forgot password button clicked");
+    try{
+      const response = await forgotPassowrd(email);
+      console.log("Forgot password successful", response);
+      Alert.alert('Success','Email sent successfuly');
+    } catch (error:any){
+      console.error("Forgot password failed", error);
+      Alert.alert('Error', error.response?.data?.message || "An unknown error occurred.")
+    }
   }
 
   const handleGoogleLogin = async () => {
