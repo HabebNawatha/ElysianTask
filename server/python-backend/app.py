@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_cors import cross_origin
+from flask_mail import Mail, Message
 from pymongo.mongo_client import MongoClient
 from dotenv import load_dotenv
 import google.auth.transport.requests
@@ -21,7 +22,14 @@ USERS_COLLECTION = os.getenv("USERS_COLLECTION")
 app = Flask(__name__)
 
 CORS(app, resources={r"/*": {"origins": ["http://localhost:3000", "http://localhost:8081"]}})
-
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER')
+app.config['MAIL_PORT'] = os.getenv('MAIL_PORT')
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS') == 'True'
+app.config['MAIL_USE_SSL'] = os.getenv('MAIL_USE_SSL') == 'True'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
+mail = Mail(app)
 
 
 client = MongoClient(MONGO_URI,tlsCAFile=certifi.where())
@@ -149,7 +157,53 @@ def register():
     users_collection.insert_one(new_user)
 
     return jsonify({'message':'User registered successfuly!'}),201
+
+@app.route('/forgot-password', methods=['POST'])
+def forgot_password():
+    try:
+        data = request.get_json()
+        recipient_email = data.get('email')
+        if not recipient_email:
+            return jsonify({'message': 'Email is required!'}), 400
+        
+        msg = Message(
+            subject="Password Rset Request",
+            recipients=[recipient_email],
+            body="Click the link to reset your password: http://localhost:3000/forgot-password"
+        )
+
+        mail.send(msg)
+        return jsonify({'message': 'Password reset email sent successfully.'}), 200
+    except Exception as e:
+        return {"message": str(e)}, 500
     
+@app.route('/change-password' , methods=['POST'])
+def change_password():
+    try:
+        data = request.get_json()
+        user_data = data.get('userData')
+        email = user_data.get('email')
+        new_password = user_data.get('password')
+
+        if not email or not new_password:
+            return jsonify({'message': 'Email, and new password are required!'}), 400
+        
+        users_collection = db[USERS_COLLECTION]
+        user = users_collection.find_one({"email": email})
+        if not user:
+            return jsonify({'message': 'User not found!'}), 404
+        
+        hashed_new_password = generate_password_hash(new_password)
+        users_collection.update_one(
+            {"email": email},
+            {"$set": {"password": hashed_new_password}}
+        )
+
+        return jsonify({'message': 'Password changed successfully!'}), 200
+    
+    except Exception as e:
+        print(f"Error during password change: {e}")
+        return jsonify({'message': 'An error occurred while changing the password.'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True)
