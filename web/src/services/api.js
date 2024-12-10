@@ -44,3 +44,23 @@ export const facebookLogin = async (accessToken) => {
         throw error;
     }
 };
+
+export const forgotPassword = async (email) => {
+    try{
+        const response = await api.post("/forgot-password", {email});
+        return response.data;
+    } catch (error) {
+        console.error("Error during forgot passsword handling:", error);
+        throw error;
+    }
+}
+
+export const changePassword = async (userData) => {
+    try {
+        const response = await api.post("/change-password" , {userData});
+        return response.data;
+    } catch (error) {
+        console.error("Error during change password:", error);
+        throw error;
+    }
+}
