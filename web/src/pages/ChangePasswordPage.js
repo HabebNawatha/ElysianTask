@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { changePassword } from "../services/api";
 import './ChangePasswordPage.css';
 import img from '../images/image.png'
@@ -9,6 +10,7 @@ const ChangePasswordPage = () => {
     const [errorMsg, setErrorMsg] = useState("");
     const [toastMessage,setToastMessage] = useState("Login Successful");
     const [showToastMessage,setShowToastMessage] = useState(false);
+    const navigate = useNavigate();
 
     const handleChangePassword = async (e) => {
         e.preventDefault();
@@ -26,6 +28,10 @@ const ChangePasswordPage = () => {
                 setErrorMsg("");
             }, 3000);
         }
+    }
+
+    const handleBackToLogin = ()=> {
+        navigate('/');
     }
 
     const handleCloseToast = () => {
@@ -57,6 +63,9 @@ const ChangePasswordPage = () => {
                         <div className='form-buttons'>
                             <button className="submit-button" type="submit">Change Password</button>
                         </div>
+                        <button className="back-to-login-button" type="button" onClick={handleBackToLogin}>Back to Login</button>
+
+                        
                     </form>
                 </div>
             </div>
